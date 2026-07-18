@@ -222,7 +222,11 @@ hidden completion blockers.
 - Root: /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system
 - Branch and implementation commit: main at
   fc743de5f0876d52475c9892c9613ee166f23c83.
-- Git remote: none configured.
+- Published repository: https://github.com/ownasquare/autonomous-research-system
+- Git remote: `origin` uses the HTTPS repository URL above; `main` tracks
+  `origin/main`. The initial publication resolved remote `main` to
+  9d4f26737bec7d00264fa746684b09d86cdd9582.
+- Repository visibility and default branch: public, `main`.
 - Core purpose: Accept a focused research topic and coordinate Researcher,
   Summarizer, Critic, and Report Writer agents to produce a cited, reviewable,
   exportable report.
@@ -332,6 +336,9 @@ hidden completion blockers.
   local Streamlit product.
 - Built and validated image manifest
   sha256:2f65529b9f4281c9fa5091f1a9852a4cb6a4f17d63cd470a2dd7cf497ef46e2f.
+- Created the public `ownasquare/autonomous-research-system` GitHub repository,
+  pushed local `main`, configured `origin`, and verified repository metadata plus
+  the remote branch SHA through independent readback.
 - Final implementation commit:
   fc743de5f0876d52475c9892c9613ee166f23c83.
 - Open threads: only the explicit deferred inventory; no baseline work remains.
@@ -354,6 +361,8 @@ hidden completion blockers.
   capabilities dropped; no-new-privileges; PID limit 256.
 - Restart readback: two completed records before restart and the same two plus
   latest run ID 0f3cd260-5a31-4425-a06c-1bea166afd7a after restart.
+- GitHub publication readback: public repository owner/name, description, default
+  branch, tracking remote, and remote `main` SHA all matched the intended target.
 - Testing gaps: credentialed live providers, hosted multi-user behavior, and
   production remain deliberately unverified.
 - Useful commands:
@@ -469,7 +478,10 @@ hidden completion blockers.
 - Container:
   /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/Dockerfile
   and compose.yaml.
-- Git commit: fc743de5f0876d52475c9892c9613ee166f23c83.
+- GitHub repository: https://github.com/ownasquare/autonomous-research-system
+- Implementation commit: fc743de5f0876d52475c9892c9613ee166f23c83.
+- Initial published completion commit:
+  9d4f26737bec7d00264fa746684b09d86cdd9582.
 - External references are listed in docs/architecture.md. Use primary provider
   documentation for future technical changes.
 
@@ -505,7 +517,8 @@ hidden completion blockers.
 - Run focused tests first, then the broad gate. For visible UI changes, use the
   in-app browser when available and Playwright for executable E2E.
 - Record live-provider, local, container, hosted, and production evidence separately.
-- Use exact file staging and intentional commits; there is currently no remote.
+- Use exact file staging and intentional commits; `origin/main` is the published
+  upstream and force-pushes are not authorized.
 - Before completing future work, update docs under the touched repo and refresh
   this handoff pattern under both required handoff locations.
 
@@ -528,7 +541,8 @@ hidden completion blockers.
    implementation and proof.
 8. Risks, Technical Debt & Strict Preservation Rules — ✅ High for current local
    scope; ⚠️ Medium for future provider/hosting behavior until revalidated live.
-9. Key Artifacts & References — ✅ High; all local paths and commit were verified.
+9. Key Artifacts & References — ✅ High; local paths, commits, public repository,
+   and remote branch readback were verified.
 10. Next Steps & Prioritized Backlog — ✅ High as a current recommendation;
     priority may change if the user authorizes hosting or supplies credentials.
 11. Continuation & Working Style Instructions — ✅ High; aligned with home rules.

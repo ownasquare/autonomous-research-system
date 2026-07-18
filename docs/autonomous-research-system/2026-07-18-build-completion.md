@@ -141,6 +141,19 @@ docker compose down
 - Crash recovery/API idempotency: Not claimed. Checkpoints support durable
   same-thread continuity, not crash resume or cross-request deduplication.
 
+## GitHub publication
+
+- Repository: https://github.com/ownasquare/autonomous-research-system
+- Owner and visibility: `ownasquare`, public.
+- Default and tracked branch: `main` tracking `origin/main` over HTTPS.
+- Initial published commit: `9d4f26737bec7d00264fa746684b09d86cdd9582`.
+- Remote readback: `gh repo view` reported the expected owner, description,
+  public visibility, and `main` default branch; `git ls-remote` independently
+  resolved remote `main` to the same initial published commit.
+- Publication scope: source and documentation only. GitHub publication is not a
+  hosted application deployment and does not change the live-provider, hosted,
+  multi-user, or production proof boundaries above.
+
 ## Failure-and-repair record
 
 1. `pip-audit` identified an unpatched ChromaDB vulnerability. ChromaDB and its
