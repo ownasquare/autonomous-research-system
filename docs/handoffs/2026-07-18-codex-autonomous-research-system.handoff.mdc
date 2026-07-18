@@ -1,0 +1,539 @@
+---
+description: Completed Research Desk build, proof record, deferred inventory, and zero-context continuation package
+alwaysApply: false
+---
+
+# INVENTORY NEXT ITEMS
+
+## Inventory scan result
+
+No unresolved baseline defect was found after the final current-truth scan. The
+completed scan covered the full source tree, LangGraph routes, provider adapters,
+memory/checkpoint/run persistence, API and CLI contracts, Streamlit UI, exports,
+security and trust documentation, dependency lock, Python package artifacts,
+Playwright journeys, Docker configuration, hardened container runtime, and
+restart persistence. The release gate was 127 passed, 3 explicitly deselected,
+87.67 percent branch coverage, 2 deterministic evaluations, 2 of 2 local E2E,
+2 of 2 container E2E, clean Ruff, mypy, Bandit, pip-audit, wheel smoke, and
+container readback. The remaining items are deliberate next-phase work, not
+hidden completion blockers.
+
+## Item 1 — Live provider acceptance proof
+
+- **Who:** Research Desk provider integration owners; repository
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system;
+  Tavily, arXiv, and OpenAI live-mode surfaces.
+- **What:** Run and archive credentialed live acceptance proof without weakening
+  the existing demo/live integrity boundary.
+- **How discovered:** The final validation inventory confirmed that live tests are
+  intentionally marked and deselected in the default suite, and no provider
+  credentials were used in this completed build.
+- **Where to fix:** tests/live/test_live_providers.py, docs/evaluation.md,
+  docs/security.md, src/research_system/tools/tavily.py,
+  src/research_system/tools/arxiv.py, and src/research_system/llm.py.
+- **When it appears:** When RESEARCH_MODE is live and a user selects Web, arXiv,
+  or the OpenAI model adapter.
+- **Detailed description:** Unit tests prove provider normalization, retries,
+  limits, invalid-URL skipping, prompt budgets, and arXiv pacing with mocked
+  transports. They do not prove current provider credentials, quota, dashboard
+  policy, real response formats, latency, or external retention behavior.
+- **Acceptance criteria:**
+  - Run make test-live with intentionally provisioned test credentials.
+  - Capture provider name, model, timestamp, query count, latency, and integrity
+    labels without capturing secrets or private content.
+  - Prove no demo_fixture source appears in a live result.
+  - Prove a provider failure is visible as a warning while surviving evidence
+    remains correctly labeled.
+  - Archive the proof separately from local deterministic and production claims.
+- **Definition of done:** A dated live-provider proof document records successful
+  Tavily, arXiv, and OpenAI calls or exact provider-specific blockers; results
+  read back through the normal run ledger; the default keyless suite remains
+  network-isolated; no credentials enter git, logs, screenshots, or handoffs.
+- **Reason why the issue exists:** Credentials were not supplied for this task,
+  and silently using personal or production credentials would violate scope,
+  cost, privacy, and proof-boundary requirements.
+- **Priority:** P2.
+- **Why this priority:** It is required before claiming live-provider acceptance,
+  but it does not block the complete deterministic local product delivered here.
+- **How to prevent regressions:** Keep live tests opt-in, retain the no-fixture
+  live contract, pin adapter schemas, and require a dated proof on provider or
+  model changes.
+- **How to ensure proper testing:** Use pytest live tests for provider contracts
+  and Playwright for any browser E2E. Do not introduce Cypress E2E.
+- **Audit policies:** Secret-safe execution, validation-proof separation,
+  source-integrity readback, provider data-flow disclosure, dependency audit,
+  and no-environment-dump policy.
+- **Other considerations:**
+  - Confirm provider data retention and organizational approval before sensitive
+    PDF or memory content is submitted.
+  - Keep cost, rate-limit, and retry budgets bounded.
+  - Do not relabel live results as production proof.
+
+## Item 2 — Hosted multi-user security and persistence
+
+- **Who:** Future hosting/platform owner for Research Desk.
+- **What:** Replace the intentionally single-user local boundary with authenticated,
+  tenant-isolated hosted infrastructure.
+- **How discovered:** Architecture and security review confirmed that the current
+  process-wide engine and SQLite stores are explicitly designed for one local
+  writer, while no hosted or production claim is made.
+- **Where to fix:** src/research_system/api, src/research_system/engine.py,
+  src/research_system/persistence, src/research_system/memory, compose.yaml,
+  docs/operations.md, and future infrastructure manifests.
+- **When it appears:** Before exposing the UI or API beyond a trusted localhost,
+  running multiple replicas, or storing data for more than one user or tenant.
+- **Detailed description:** The current runtime has no authentication, authorization,
+  tenant key, encryption-at-rest policy, retention/deletion workflow, distributed
+  lock, networked checkpointer, centralized rate limiter, or hosted backup service.
+  SQLite and the process-wide lock correctly protect the local product but are not
+  a horizontal-scaling architecture.
+- **Acceptance criteria:**
+  - Authenticate every UI and API request.
+  - Scope runs, checkpoints, sources, uploads, and memory by immutable tenant and
+    user identity.
+  - Use a supported networked persistence layer with migrations, encryption,
+    backup, restore, and retention proof.
+  - Add per-tenant quotas, provider budgets, abuse controls, audit logs, and
+    deletion/export workflows.
+  - Prove anonymous-to-authenticated and cross-tenant isolation regressions.
+- **Definition of done:** Two isolated test tenants can run concurrently without
+  reading, mutating, recalling, exporting, or deleting one another's data; backup
+  and restore are proven; auth failures are typed; provider costs are attributable;
+  hosted health and observability are documented.
+- **Reason why the issue exists:** The requested goal was a complete portfolio-grade
+  local project, not authorization to create or deploy a production SaaS control
+  plane.
+- **Priority:** P2 before hosting; P4 while the product remains localhost-only.
+- **Why this priority:** Exposure without these controls would be high risk, but no
+  current local baseline is broken.
+- **How to prevent regressions:** Make tenant identity mandatory in persistence
+  schemas and cache keys, add isolation fixtures, and block deployment when auth
+  or migration checks fail.
+- **How to ensure proper testing:** Add API integration tests, state readback tests,
+  concurrency/load tests, and Playwright hosted E2E. Cypress remains component-only
+  if a React surface is ever added.
+- **Audit policies:** Identity-context regression, state-readback persistence,
+  route/API contract mapping, validation-proof selector, deploy-automation hazards,
+  least privilege, and secret-safe execution.
+- **Other considerations:**
+  - Reassess third-party provider terms and regional data residency.
+  - Add malware scanning and object storage lifecycle controls for uploads.
+  - Separate local, hosted-dev, and production proof.
+
+## Item 3 — Crash recovery, stale-run reconciliation, and request idempotency
+
+- **Who:** ResearchEngine and FastAPI lifecycle owner.
+- **What:** Add explicit resume/reconciliation semantics and cross-request
+  idempotency for resilient service operation.
+- **How discovered:** Checkpoint review proved durable same-thread follow-up state,
+  but the engine intentionally starts a new run for every request and does not
+  reconcile a process killed between pending, running, and terminal persistence.
+- **Where to fix:** src/research_system/engine.py,
+  src/research_system/api/routes.py, src/research_system/persistence/runs.py,
+  src/research_system/persistence/checkpoints.py, and related integration tests.
+- **When it appears:** Process crash, host restart during an active graph, client
+  retry after a timeout, or duplicate POST /research submission.
+- **Detailed description:** Stable run and thread IDs support readback and
+  continuation but do not deduplicate externally repeated requests. A killed run
+  can remain pending or running, and there is no public resume/cancel endpoint or
+  policy for deciding whether provider calls may be replayed.
+- **Acceptance criteria:**
+  - Define immutable idempotency-key semantics and persistence.
+  - Repeated identical requests return the original run without repeating paid
+    provider calls.
+  - Startup reconciliation classifies stale runs and either resumes from a safe
+    checkpoint or marks them interrupted with an auditable reason.
+  - Cancellation has a terminal state and does not corrupt checkpoint history.
+  - Recovery tests inject failure at every stage boundary.
+- **Definition of done:** Restart and duplicate-request test matrices prove
+  exactly-once externally visible semantics where promised, at-most-once paid
+  provider calls where feasible, durable terminal state, and a documented policy
+  for non-replayable work.
+- **Reason why the issue exists:** Reliable distributed execution requires product
+  decisions about replay and billing that were outside the local single-process
+  goal. The current docs deliberately avoid a crash-resume claim.
+- **Priority:** P2 for service deployment; P3 for localhost-only use.
+- **Why this priority:** It affects resilience and cost under crashes/retries but
+  does not invalidate ordinary local runs or same-thread follow-ups.
+- **How to prevent regressions:** Persist idempotency and stage transitions
+  transactionally, use failure-injection tests, and forbid untracked provider calls.
+- **How to ensure proper testing:** Integration tests with forced process-stage
+  failures, concurrent duplicate requests, restart readback, and Playwright only
+  for user-visible resume/cancel behavior.
+- **Audit policies:** State-readback persistence, route/API contract map,
+  provider-cost boundary, deploy-automation hazards, and completion proof labels.
+- **Other considerations:**
+  - Preserve conversation and source budgets on resume.
+  - Do not call checkpoint durability fault tolerance until recovery is proven.
+  - Decide retention for interrupted checkpoints.
+
+## Item 4 — Optional scale, ingestion, and experience extensions
+
+- **Who:** Future product and evaluation owners.
+- **What:** Add paginated lightweight history, cancellation, bounded memory-index
+  lifecycle, OCR for scanned PDFs, deeper semantic faithfulness evaluation, and
+  an optional dark theme.
+- **How discovered:** Final inventory compared the complete local goal with likely
+  next-phase product expectations and deliberately excluded features documented
+  in current proof boundaries.
+- **Where to fix:** src/research_system/persistence/runs.py,
+  src/research_system/memory/vector.py, src/research_system/tools/pdf.py,
+  src/research_system/ui, tests/eval, and docs.
+- **When it appears:** Very large run histories or memory stores, scanned-image
+  PDFs, long-running work users want to cancel, stricter qualitative evaluation,
+  or a future visual-theme requirement.
+- **Detailed description:** The current product returns bounded recent runs,
+  rejects image-only PDFs with a clear message, retains critic-approved memory
+  until the local data directory is managed, and validates structural/citation
+  quality more deeply than open-ended semantic truth. It intentionally ships one
+  accessible light theme.
+- **Acceptance criteria:**
+  - Define each feature as a separate scoped objective before implementation.
+  - Pagination returns summaries without loading every full report payload.
+  - Memory retention/deletion preserves provenance and readback.
+  - OCR is opt-in, resource-bounded, language-aware, and labels extracted text.
+  - Semantic evaluations use dated expert-reviewed cases and measurable rubrics.
+  - Any dark theme preserves contrast, focus, loading, warning, and mobile states.
+- **Definition of done:** Each selected extension has an owner, performance or
+  quality target, automated regressions, rendered proof where relevant, updated
+  completion documentation, and no weakened existing integrity boundary.
+- **Reason why the issue exists:** These are valuable extensions but were not
+  required for the user's requested complete supervised research workflow.
+- **Priority:** P3 for scaling and cancellation; P4 for OCR, deeper eval expansion,
+  and dark theme until specifically requested.
+- **Why this priority:** They improve capacity and polish rather than repair a
+  current correctness or security failure.
+- **How to prevent regressions:** Add explicit budgets, migration tests, golden
+  evaluation versioning, and visual proof at supported breakpoints.
+- **How to ensure proper testing:** Python unit/integration/load tests for storage
+  and OCR; deterministic eval suites for quality; Playwright for full UI flows.
+- **Audit policies:** Validation-proof selector, design-system consistency,
+  state-readback persistence, dependency/license review, and accessibility checks.
+- **Other considerations:**
+  - OCR introduces native dependencies and new license/security review.
+  - Retention changes require backup/delete semantics.
+  - Do not flatten optional polish into a false baseline blocker.
+
+# 1. Project Identity & Strategic Context
+
+**Freshness: ✅ High — verified 2026-07-18.**
+
+- Project: Research Desk / Autonomous Multi-Agent Research System.
+- Root: /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system
+- Branch and implementation commit: main at
+  fc743de5f0876d52475c9892c9613ee166f23c83.
+- Git remote: none configured.
+- Core purpose: Accept a focused research topic and coordinate Researcher,
+  Summarizer, Critic, and Report Writer agents to produce a cited, reviewable,
+  exportable report.
+- Measurable success: explicit LangGraph orchestration; bounded revisions; stable
+  source IDs; source integrity labels; durable run, checkpoint, memory, and
+  conversation readback; keyless demo; opt-in live providers; responsive UI;
+  API and CLI; package and hardened container; green security and quality gates.
+- Hard constraints: no silent demo substitution in live mode; no live claim from
+  fixtures; no secret output; normal tests have network disabled; PDFs are bounded;
+  model/provider text is untrusted; one local writer; no Cypress E2E; Playwright
+  owns E2E; completion docs and mirrored handoff are mandatory.
+- Design philosophy: familiar workbench rather than AI-demo theatrics, progressive
+  disclosure, visible evidence provenance, explicit quality review, and honest
+  local/hosted/production proof boundaries.
+- Stack: Python 3.11 through 3.13, LangGraph, LangChain/OpenAI, Tavily, httpx,
+  arXiv Atom API, PyMuPDF, Streamlit, FastAPI, Typer, Pydantic, SQLite,
+  deterministic local embeddings, uv, pytest, Ruff, mypy, Bandit, pip-audit,
+  Playwright, and Docker Compose.
+- License: AGPL-3.0-or-later because PyMuPDF is used under its AGPL option. A
+  proprietary distribution needs a commercial PyMuPDF license or replacement.
+
+# 2. Current System State & Architecture Map
+
+**Freshness: ✅ High — verified from source, tests, browser, package, and container.**
+
+- Fully implemented and working:
+  - ResearchEngine with serialized run lifecycle, streaming events, persistence,
+    approved-memory writeback, follow-up source continuity, and sanitized failures.
+  - Explicit supervisor graph routing researcher to summarizer to critic to writer,
+    with bounded research and summary revisions.
+  - Tavily, arXiv, PDF, memory, and bundled-demo adapters with validation,
+    deduplication, fair interleaving, budgets, retries, and integrity labels.
+  - Bounded short-term conversation memory plus SQLite deterministic vector memory.
+  - Streamlit workbench with New Research, Library, Settings, stages, report,
+    sources, critic, activity, follow-up, and three export formats.
+  - FastAPI health, research, history, and detail routes; optional thread ID.
+  - Typer demo, research, UI, API, history, and graph commands.
+  - Wheel/sdist, CI, Dockerfile, Compose, docs, security policy, and tests.
+- Partially built or in progress: none for the completed local objective.
+- Broken/flaky/blocked: none known in the baseline.
+- Deliberately deferred: the four inventory groups above.
+- End-to-end flow:
+  1. UI/API/CLI validates ResearchRequest.
+  2. Engine creates pending and running run records.
+  3. PDF uploads parse into bounded Source records.
+  4. Supervisor routes query planning and evidence gathering.
+  5. Summarizer produces structured findings.
+  6. Critic approves or requests a bounded revision.
+  7. Writer creates and validates cited ResearchReport.
+  8. Engine persists the terminal result and writes only warning-free,
+     critic-approved memory.
+  9. UI/API/CLI reads the same canonical result; exports preserve provenance.
+- Key data structures: ResearchRequest, Source, QueryPlan, Synthesis, Critique,
+  ResearchReport, ResearchResult, WorkflowEvent, and ResearchState.
+- Naming conventions: source IDs S1 and upward; historical recalled citations
+  prior-S1 and upward; integrity values demo_fixture, live_web, live_arxiv,
+  user_upload, and accepted_memory.
+- Current runtime state: container stopped cleanly after proof; named Docker volume
+  research-desk_research-data remains; local image research-desk:local remains.
+
+# 3. Critical Decisions & Reasoning History
+
+**Freshness: ✅ High — decisions are reflected in current commit and docs.**
+
+- LangGraph custom StateGraph was chosen over opaque prebuilt orchestration so
+  routes, revision budgets, state, and trace are explicit.
+- A deterministic offline model and dated demo corpus are the default so the
+  project is runnable without keys, credits, or hidden network calls.
+- Live mode never falls back to fixtures. Partial live provider failure becomes a
+  visible warning if other evidence survives.
+- ChromaDB was removed after a no-fixed-version audit finding. SQLite vector memory
+  avoids an exposed server and vulnerable transitive set while retaining durable
+  semantic recall.
+- PyMuPDF was kept for mature PDF parsing, with AGPL licensing disclosed.
+- Streamlit was selected for a complete portfolio workbench quickly; custom CSS
+  follows a restrained document/research product aesthetic.
+- One process-wide UI engine plus an engine run lock preserves a single local
+  SQLite writer across Streamlit sessions. API and UI must not run concurrently
+  on the same volume.
+- arXiv cache misses and requests are serialized so the documented minimum pacing
+  survives concurrent callers.
+- Prior same-thread PDFs are preserved for follow-up, but old web/arXiv evidence is
+  not inserted ahead of fresh sources and allowed to consume the new budget.
+- Normal pytest sockets are disabled with Unix IPC allowed. Live and E2E targets
+  explicitly opt in.
+- Source URLs, prompt payloads, conversation windows, titles, PDFs, upload batches,
+  retries, source counts, and revision counts all have enforced bounds.
+
+# 4. Recent Work & Iteration Log (High Priority)
+
+**Freshness: ✅ High — this is the completing session.**
+
+- Built the entire new repository and initialized independent git history.
+- Added the four-agent graph, deterministic/OpenAI adapters, source tools,
+  persistence, memory, API, CLI, UI, exports, package, CI, and container.
+- Replaced ChromaDB with SQLite vector memory after dependency audit.
+- Added fair provider interleaving, demo relevance gating, truthful source
+  selection, per-result URL validation, and invalid-provider-result skipping.
+- Added bounded conversation context, real cited follow-up answers, comparison
+  tables, revision-feedback propagation, warning reset, and uploaded-PDF reuse.
+- Added critic-approved-only memory writes and explicit accepted-memory semantics.
+- Hardened UI rendering for titles, snippets, authors, warnings, limitations,
+  reports, activity, and sidebar labels.
+- Added process-wide engine ownership, serialized local runs, atexit cleanup,
+  arXiv concurrency pacing, PDF extraction normalization, and upload batch limits.
+- Added configurable Compose host ports after 8501 was occupied by an unrelated
+  local Streamlit product.
+- Built and validated image manifest
+  sha256:2f65529b9f4281c9fa5091f1a9852a4cb6a4f17d63cd470a2dd7cf497ef46e2f.
+- Final implementation commit:
+  fc743de5f0876d52475c9892c9613ee166f23c83.
+- Open threads: only the explicit deferred inventory; no baseline work remains.
+
+# 5. Testing, Validation & Quality Framework
+
+**Freshness: ✅ High — all results recorded on 2026-07-18.**
+
+- make check: 127 passed, 3 deselected, 87.67 percent branch coverage.
+- Static/security: Ruff clean, Ruff format clean, strict mypy clean across 47
+  source files, Bandit clean, pip-audit no known vulnerabilities.
+- make eval: 2 deterministic golden cases passed.
+- Local E2E at port 8504: 2 of 2 passed, including 390px mobile overflow check.
+- In-app browser: complete four-stage flow, cited report, source integrity label,
+  critic, follow-up, downloads, zero browser errors, no mobile overflow.
+- Container E2E at isolated host port 8505: 2 of 2 passed.
+- Package: wheel and sdist built; wheel reinstalled in
+  /private/tmp/research-desk-wheel.uJAPbb/.venv; research-desk graph succeeded.
+- Container: healthy; UID/GID 10001; /app/data mode 0700; read-only root; all
+  capabilities dropped; no-new-privileges; PID limit 256.
+- Restart readback: two completed records before restart and the same two plus
+  latest run ID 0f3cd260-5a31-4425-a06c-1bea166afd7a after restart.
+- Testing gaps: credentialed live providers, hosted multi-user behavior, and
+  production remain deliberately unverified.
+- Useful commands:
+  - uv sync --frozen --all-groups
+  - make check
+  - make eval
+  - make test-e2e after starting the UI
+  - make test-live only with approved provider credentials
+  - docker compose build
+  - RESEARCH_DESK_UI_PORT=8505 docker compose up -d workbench
+
+# 6. Debugging History & Failure Modes
+
+**Freshness: ✅ High — reproduced and repaired in this session.**
+
+- ChromaDB audit failure: no fixed release. Resolution: removed dependency and
+  implemented SQLite vector memory.
+- Warning reducer leakage: prior-run warnings survived follow-up. Resolution:
+  scalar warning state with explicit same-run merges and regression coverage.
+- Evidence starvation: full previous source sets could crowd out new research.
+  Resolution: only user-upload evidence is carried as upload priority.
+- Demo truth failure: generic words such as source, workflow, memory, or agent
+  could trigger unrelated fixtures. Resolution: agent-system or research-quality
+  conjunction gate plus negative cases.
+- Untrusted rendering: provider/model Markdown could create images or raw HTML.
+  Resolution: literal escaping and report sanitization, with UI injection tests.
+- arXiv concurrency race: two cache misses could bypass first-request pacing.
+  Resolution: serialized search/cache/request lock and concurrent regression.
+- PDF failure escape: page extraction RuntimeError could fail the run. Resolution:
+  normalized SourceValidationError and per-upload warning boundary.
+- Browser ambiguity: duplicate Research Desk headings and mobile sidebar overlay.
+  Resolution: level-aware selectors and automatic responsive sidebar state.
+- First container build was cancelled because its source became stale and the
+  dependency layer was slow. Resolution: cache-mounted two-stage uv sync.
+- First port-8501 container E2E reached an unrelated Codebase Intelligence app.
+  Resolution: preserve the external app, parameterize host ports, prove on 8505.
+- Effective debugging pattern: surface exact terminal result, inspect persisted
+  state separately from UI, add the smallest failing regression, then rerun the
+  full gate and proof layer.
+
+# 7. Established Processes & Effective Patterns
+
+**Freshness: ✅ High — used throughout the build.**
+
+1. Read /Users/fortunevieyra/AGENTS.md and home Codex rules first.
+2. Run every shell command through
+   /Users/fortunevieyra/.codex/bin/codex-secret-safe-exec.py with opaque argv.
+3. Use apply_patch for file edits; never dump environment values.
+4. Inspect current source and rendered behavior before changing product claims.
+5. Keep deterministic, live-provider, local-browser, container, hosted, and
+   production evidence as separate proof layers.
+6. Add focused regression tests for each discovered boundary.
+7. Run Ruff formatting, focused tests, strict types, then make check.
+8. Run make eval, package build/wheel smoke, and Playwright E2E.
+9. Validate Compose config, image build, health, non-root/security flags, mutation,
+   restart, and readback; stop cleanly without deleting the named volume.
+10. Update per-repo completion docs, run the post-chat inventory, write/mirror the
+    12-section handoff, and commit intentionally.
+- Communication standard: lead with current outcome; identify exact proof scope;
+  call out external conflicts without stopping unrelated processes; avoid turning
+  fixture success into provider or production success.
+
+# 8. Risks, Technical Debt & Strict Preservation Rules
+
+**Freshness: ✅ High — verified against current proof boundaries.**
+
+- Risks and debt are exactly the four deferred inventory groups.
+- Do Not Touch without explicit instruction:
+  - Do not weaken the demo/live integrity separation or silently add fixtures.
+  - Do not reintroduce ChromaDB without a patched-version and dependency audit.
+  - Do not remove AGPL disclosure while PyMuPDF remains.
+  - Do not enable network access in the default test suite.
+  - Do not convert Cypress into an E2E tool; Playwright owns E2E.
+  - Do not expose environment values, provider keys, upload contents, or private
+    memory in diagnostics.
+  - Do not run UI and API as concurrent writers on one SQLite data directory.
+  - Do not call checkpoints crash recovery until resume/reconciliation is proven.
+  - Do not claim live, hosted, production, dark-mode, or multi-user validation.
+  - Do not delete the named Docker volume unless the user explicitly requests it.
+- Common next-agent mistakes: trusting older counts, treating accepted_memory as
+  human approval, broadening demo relevance, passing previous live sources as
+  upload priority, rendering provider text as Markdown, or flattening local
+  container proof into production.
+
+# 9. Key Artifacts & References
+
+**Freshness: ✅ High — paths verified.**
+
+- Completion record:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/docs/autonomous-research-system/2026-07-18-build-completion.md
+- Architecture:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/docs/architecture.md
+- Security and data flow:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/docs/security.md
+- Operations:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/docs/operations.md
+- Engine:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/engine.py
+- Graph:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/graph.py
+- Model adapters:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/llm.py
+- Source facade:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/tools/sources.py
+- UI:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/ui/app.py
+- Persistence:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/persistence
+- Memory:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/src/research_system/memory/vector.py
+- Test suite:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/tests
+- Container:
+  /Users/fortunevieyra/Documents/Github/ai-projects/autonomous-research-system/Dockerfile
+  and compose.yaml.
+- Git commit: fc743de5f0876d52475c9892c9613ee166f23c83.
+- External references are listed in docs/architecture.md. Use primary provider
+  documentation for future technical changes.
+
+# 10. Next Steps & Prioritized Backlog
+
+**Freshness: ✅ High — seeded from the inventory above.**
+
+- Immediate next task: none required for the completed local goal.
+- If live acceptance is desired, take Item 1 first and require explicit approved
+  test credentials. Do not begin by deploying.
+- Before any hosted exposure, complete Item 2, then Item 3. Identity and tenant
+  isolation precede resilience polish because data separation is non-negotiable.
+- Take Item 4 only as separately scoped product objectives.
+- Current blockers: no baseline blockers. Live proof depends on credentials and
+  provider approval. Hosted work depends on architecture and deployment authority.
+- Recommended sequence:
+  1. Credentialed live-provider acceptance.
+  2. Hosted identity/tenant/persistence design if hosting is authorized.
+  3. Idempotency, reconciliation, cancellation, and failure injection.
+  4. Scale, OCR, deeper evaluations, and optional theme work.
+
+# 11. Continuation & Working Style Instructions
+
+**Freshness: ✅ High — derived from governing rules and successful execution.**
+
+- Start from this handoff and current git truth; do not restart broad discovery.
+- Verify branch, commit, status, owner/process state, and proof layer before edits.
+- Read the closest source, test, and rendered surface for any behavior being changed.
+- Be skeptical of fluent reports: validate citations, integrity labels, status,
+  persistence, and readback independently.
+- Preserve bounded inputs, retries, prompts, conversation, uploads, revisions, and
+  provider calls.
+- Run focused tests first, then the broad gate. For visible UI changes, use the
+  in-app browser when available and Playwright for executable E2E.
+- Record live-provider, local, container, hosted, and production evidence separately.
+- Use exact file staging and intentional commits; there is currently no remote.
+- Before completing future work, update docs under the touched repo and refresh
+  this handoff pattern under both required handoff locations.
+
+# 12. Confidence & Freshness Assessment
+
+**Freshness: ✅ High — assessed 2026-07-18 at final handoff.**
+
+1. Project Identity & Strategic Context — ✅ High; verified from pyproject,
+   governing rules, current source, and completion record.
+2. Current System State & Architecture Map — ✅ High; verified from commit,
+   full test suite, browser, package, and container.
+3. Critical Decisions & Reasoning History — ✅ High; reflected in current source,
+   dependency lock, tests, and docs.
+4. Recent Work & Iteration Log — ✅ High; completed in this session.
+5. Testing, Validation & Quality Framework — ✅ High; commands and observed
+   results are dated in this artifact.
+6. Debugging History & Failure Modes — ✅ High; each baseline failure was
+   reproduced and repaired in this session.
+7. Established Processes & Effective Patterns — ✅ High; used successfully across
+   implementation and proof.
+8. Risks, Technical Debt & Strict Preservation Rules — ✅ High for current local
+   scope; ⚠️ Medium for future provider/hosting behavior until revalidated live.
+9. Key Artifacts & References — ✅ High; all local paths and commit were verified.
+10. Next Steps & Prioritized Backlog — ✅ High as a current recommendation;
+    priority may change if the user authorizes hosting or supplies credentials.
+11. Continuation & Working Style Instructions — ✅ High; aligned with home rules.
+
+Overall confidence: ✅ High for source-complete deterministic local, browser,
+package, and container claims. ⚠️ Medium for future live-provider integration
+until credentialed tests are run. ❓ Low for hosted or production behavior because
+neither was implemented or claimed.
