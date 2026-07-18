@@ -1,0 +1,38 @@
+[
+  {
+    "title": "State graphs make agent orchestration inspectable",
+    "url": "demo://state-graphs-and-supervision",
+    "snippet": "A supervisor can route bounded work through explicit state transitions and revision limits.",
+    "content": "Bundled demo evidence snapshot, reviewed 2026-07-18. A state-graph design makes a multi-agent research workflow easier to inspect because routing decisions, inputs, outputs, retry limits, and terminal states are represented explicitly. A supervisor should delegate bounded tasks to specialist workers rather than ask every worker to solve the full problem. State persisted at each transition supports resumability and audit trails. This fixture is an offline teaching summary, not a live copy of provider documentation.",
+    "authors": ["Research Desk demo corpus"],
+    "published_at": "2026-07-18T00:00:00+00:00",
+    "locator": "Offline fixture: orchestration architecture"
+  },
+  {
+    "title": "Source diversity improves research synthesis",
+    "url": "demo://source-diversity-and-synthesis",
+    "snippet": "High-quality synthesis separates evidence collection from claim construction and records provenance.",
+    "content": "Bundled demo evidence snapshot, reviewed 2026-07-18. Research synthesis is more robust when the workflow distinguishes source acquisition, evidence extraction, claim formation, and citation validation. Web results, scholarly records, user documents, and accepted prior memory carry different provenance. The final report should keep those integrity labels visible, surface contradictions, and avoid presenting a bundled fixture as live evidence. This fixture is intentionally local and should always be labeled demo_fixture.",
+    "authors": ["Research Desk demo corpus"],
+    "published_at": "2026-07-18T00:00:00+00:00",
+    "locator": "Offline fixture: evidence quality"
+  },
+  {
+    "title": "Critic loops need measurable stopping rules",
+    "url": "demo://critic-revision-stopping-rules",
+    "snippet": "A critic is most useful when it scores citation coverage, evidence quality, and unsupported claims.",
+    "content": "Bundled demo evidence snapshot, reviewed 2026-07-18. A critic agent should evaluate concrete dimensions such as citation coverage, source quality, unsupported claims, contradictions, and unanswered parts of the objective. Revision requests should name a missing query or a specific synthesis gap. Bounded revision counts prevent open-ended loops, while a recorded final critique helps readers judge the result. This fixture describes a product design pattern and is not live experimental evidence.",
+    "authors": ["Research Desk demo corpus"],
+    "published_at": "2026-07-18T00:00:00+00:00",
+    "locator": "Offline fixture: critic loop"
+  },
+  {
+    "title": "Long-term memory should preserve provenance",
+    "url": "demo://provenance-aware-long-term-memory",
+    "snippet": "Remembered reports are retrieval aids, not replacements for the original evidence inventory.",
+    "content": "Bundled demo evidence snapshot, reviewed 2026-07-18. Long-term vector memory can help a new research run find relevant prior reports, but retrieved memory should be labeled separately from live web, arXiv, or user-uploaded evidence. Deterministic local embeddings keep the offline path repeatable and avoid hidden model downloads. The remembered record should retain its run and thread identifiers so a reader can trace where the claim came from. This fixture is local demonstration material.",
+    "authors": ["Research Desk demo corpus"],
+    "published_at": "2026-07-18T00:00:00+00:00",
+    "locator": "Offline fixture: memory provenance"
+  }
+]

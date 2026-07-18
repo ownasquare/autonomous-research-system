@@ -1,0 +1,14 @@
+[
+  {
+    "topic": "How should multi-agent research systems be evaluated?",
+    "objective": "Identify architecture and evidence-quality controls for a reliable system.",
+    "minimum_sources": 4,
+    "minimum_critic_score": 0.8
+  },
+  {
+    "topic": "What makes long-term memory trustworthy in an autonomous research workflow?",
+    "objective": "Explain the provenance, persistence, and retrieval controls that matter.",
+    "minimum_sources": 4,
+    "minimum_critic_score": 0.8
+  }
+]

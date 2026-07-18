@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --frozen --all-groups
+      - run: uv lock --check
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+      - run: uv run bandit -q -r src
+      - run: uv run pytest --cov=research_system --cov-branch --cov-report=term-missing --cov-report=xml
+      - run: uv run pytest tests/eval -q
+      - run: uv run pip-audit
+      - run: uv build
+      - run: docker compose config --quiet
+      - run: docker build -t research-desk:test .
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --frozen --all-groups
+      - run: uv run playwright install --with-deps chromium
+      - run: docker compose up --build -d
+      - run: uv run python scripts/wait_for_http.py http://127.0.0.1:8501/_stcore/health
+      - run: uv run pytest --force-enable-socket -m e2e tests/e2e -q
+        env:
+          RESEARCH_DESK_BASE_URL: http://127.0.0.1:8501
+      - if: always()
+        run: docker compose down
+
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --frozen --all-groups
+      - run: uv run pytest -q
